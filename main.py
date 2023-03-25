@@ -19,6 +19,10 @@ def chat(question):
     result = pyrequests.post('https://api.miragari.com/fast/fastChat',json={'question':question})
     return json.loads(result.text)
 
+def getTokenNum(question):
+    result = pyrequests.post('https://api.miragari.com/fast/getTokenNum',json={'question':question})
+    return result.text
+
 @app.route('/', methods=['POST','GET'])
 def fast_chat():
     if request.method == 'POST':
@@ -30,6 +34,19 @@ def fast_chat():
             return '欢迎哦~'
         else:
             return chat(question)
+
+@app.route('/getToenNum', methods=['POST','GET'])
+def get_token_num():
+    if request.method == 'POST':
+        question = json.loads(request.data.decode('utf-8'))['question']
+        return getTokenNum(question)
+    if request.method == 'GET':
+        question = request.args.get('q')
+        print(question)
+        if question is None:
+            return '0'
+        else:
+            return getTokenNum(question)
 
 if __name__ == '__main__':
     app.run(debug=True, port=os.getenv("PORT", default=5000))
