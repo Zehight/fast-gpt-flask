@@ -1,7 +1,9 @@
 import os
 import requests as pyrequests
+import tiktoken
 from flask import Flask, request, render_template, jsonify, json
 from flask_cors import CORS
+
 app = Flask(__name__)
 CORS(app)
 app.config['UPLOAD_FOLDER'] = 'uploads/'
@@ -19,18 +21,18 @@ def chat(question):
     result = pyrequests.post('https://api.miragari.com/fast/fastChat',json={'question':question})
     return json.loads(result.text)
 
-def getTokenNum(question):
-    if type(question) != list:
-        question = [{'role': 'user', 'content': question}]
+def getTokenNum(messages):
+    if type(messages) != list:
+        messages = [{'role': 'user', 'content': messages}]
     num_tokens = 0
-    for message in question:
+    for message in messages:
         num_tokens += 4
         for key, value in message.items():
-            num_tokens += len(question.encoding_for_model("gpt-3.5-turbo-0301").encode(value))
+            num_tokens += len(tiktoken.encoding_for_model("gpt-3.5-turbo-0301").encode(value))
             if key == "name":
                 num_tokens += -1
     num_tokens += 2
-    return num_tokens
+    return str(num_tokens)
 
 @app.route('/', methods=['POST','GET'])
 def fast_chat():
@@ -51,7 +53,6 @@ def get_token_num():
         return getTokenNum(question)
     if request.method == 'GET':
         question = request.args.get('q')
-        print(question)
         if question is None:
             return '0'
         else:
