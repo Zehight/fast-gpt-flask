@@ -130,6 +130,7 @@ pythonenv*
 
 # mypy
 .mypy_cache/
+.idea/
 .dmypy.json
 dmypy.json
 
