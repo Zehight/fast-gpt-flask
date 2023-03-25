@@ -1,8 +1,9 @@
 import os
 import requests as pyrequests
 from flask import Flask, request, render_template, jsonify, json
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 
 # 一轮对话
