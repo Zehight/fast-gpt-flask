@@ -20,8 +20,17 @@ def chat(question):
     return json.loads(result.text)
 
 def getTokenNum(question):
-    result = pyrequests.post('https://api.miragari.com/fast/getTokenNum',json={'question':question})
-    return result.text
+    if type(question) != list:
+        question = [{'role': 'user', 'content': question}]
+    num_tokens = 0
+    for message in question:
+        num_tokens += 4
+        for key, value in message.items():
+            num_tokens += len(question.encoding_for_model("gpt-3.5-turbo-0301").encode(value))
+            if key == "name":
+                num_tokens += -1
+    num_tokens += 2
+    return num_tokens
 
 @app.route('/', methods=['POST','GET'])
 def fast_chat():
